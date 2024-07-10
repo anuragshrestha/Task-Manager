@@ -48,7 +48,7 @@ const AddTaskScreen: React.FC = () => {
             pressed && styles.pressed,
           ]}
         >
-          <Text style={styles.addButtonText}>Add Task</Text>
+          <Text style={styles.addButtonText}>Save Task</Text>
         </Pressable>
       <StatusBar
         barStyle={theme === "dark" ? "light-content" : "dark-content"}

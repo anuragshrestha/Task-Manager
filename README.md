@@ -26,7 +26,7 @@ git clone https://github.com/anuragshrestha/Task-Manager.git
 
 
 ## Step 2: Go to the project directory
-cd TaskManager
+cd TaskManager && 
 npm install
 
 

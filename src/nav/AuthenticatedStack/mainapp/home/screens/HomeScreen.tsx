@@ -1,26 +1,260 @@
-import React, { useState } from "react";
+// import React, { useEffect, useState } from "react";
+// import {
+//   StyleSheet,
+//   Text,
+//   View,
+//   FlatList,
+//   TouchableOpacity,
+//   Alert,
+//   StatusBar,
+//   Pressable,
+//   Switch,
+// } from "react-native";
+// import { useNavigation } from "@react-navigation/native";
+// import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+// import { RootStackParamList } from "../HomeStack";
+// import { useColors } from "../../../../../contexts/ColorContext";
+// import {
+//   collection,
+//   query,
+//   where,
+//   getDocs,
+//   onSnapshot,
+//   doc,
+//   updateDoc,
+// } from "firebase/firestore";
+// import {
+//   FIREBASE_AUTH,
+//   FIREBASE_DB,
+// } from "../../../../../firebase/FireBaseAuth";
+
+// type NavigationProp = NativeStackNavigationProp<
+//   RootStackParamList,
+//   "HomeScreen"
+// >;
+
+// const HomeScreen: React.FC = () => {
+//   const [tasks, setTasks] = useState<Task[]>([]);
+//   const [userName, setUserName] = useState<string | null>(null);
+//   const [completedTasks, setCompletedTasks] = useState<number>(0);
+//   const navigation = useNavigation<NavigationProp>();
+//   const user = FIREBASE_AUTH.currentUser;
+
+//   useEffect(() => {
+//     if (user) {
+//       // Fetch user data
+//       const fetchUserData = async () => {
+//         try {
+//           const userDoc = await getDocs(query(collection(FIREBASE_DB, "users"), where("uid", "==", user.uid)));
+//           const userData = userDoc.docs[0]?.data() as FirestoreUser;
+//           setUserName(userData?.name || null);
+//           setCompletedTasks(userData?.completedTasks || 0);
+//         } catch (error) {
+//           console.error("Error fetching user data: ", error);
+//         }
+//       };
+
+//       fetchUserData();
+
+//       // Fetch tasks
+//       const q = query(
+//         collection(FIREBASE_DB, "tasks"),
+//         where("userId", "==", user.uid)
+//       );
+//       const unsubscribe = onSnapshot(q, (querySnapshot) => {
+//         const tasksList: Task[] = querySnapshot.docs.map((doc) => ({
+//           id: doc.id,
+//           ...doc.data(),
+//         })) as Task[];
+//         setTasks(tasksList);
+//       });
+
+//       return () => unsubscribe();
+//     }
+//   }, [user]);
+
+//   const handleToggleTaskStatus = async (taskId: string, currentStatus: string) => {
+//     try {
+//       const taskDocRef = doc(FIREBASE_DB, "tasks", taskId);
+//       const newStatus = currentStatus === "Completed" ? "Not Completed" : "Completed";
+
+//       await updateDoc(taskDocRef, { status: newStatus });
+//       if (newStatus === "Completed") {
+//         setCompletedTasks((prevCount) => prevCount + 1);
+//         await updateDoc(doc(FIREBASE_DB, "users", user!.uid), {
+//           completedTasks: completedTasks + 1,
+//         });
+//       } else {
+//         setCompletedTasks((prevCount) => prevCount - 1);
+//         await updateDoc(doc(FIREBASE_DB, "users", user!.uid), {
+//           completedTasks: completedTasks - 1,
+//         });
+//       }
+//     } catch (error) {
+//       console.error("Error updating task status: ", error);
+//     }
+//   };
+
+//   const renderTask = ({ item }: { item: Task }) => (
+//     <TouchableOpacity style={styles.task}>
+//       <Text style={styles.taskTitle}>{item.title}</Text>
+//       <View style={styles.statusContainer}>
+//         <Text style={styles.taskStatus}>
+//           Status: {item.status}
+//         </Text>
+//         <Switch
+//           value={item.status === "Completed"}
+//           onValueChange={() => handleToggleTaskStatus(item.id, item.status)}
+//         />
+//       </View>
+//       <Text style={styles.taskDescription}>{item.description}</Text>
+//     </TouchableOpacity>
+//   );
+
+//   const { theme } = useColors();
+
+//   return (
+//     <View style={styles.container}>
+//       <Text style={styles.userName}>
+//         Welcome, you have completed {completedTasks} tasks.
+//       </Text>
+//       <Text style={styles.taskText}>All Tasks</Text>
+//       <FlatList
+//         data={tasks}
+//         renderItem={renderTask}
+//         keyExtractor={(item) => item.id}
+//         contentContainerStyle={styles.taskStyle}
+//       />
+//       <Pressable
+//         onPress={() => navigation.navigate("AddTask")}
+//         style={({ pressed }) => [
+//           styles.addButtonContainer,
+//           pressed && styles.pressed,
+//         ]}
+//       >
+//         <Text style={styles.addButtonText}>Add Task</Text>
+//       </Pressable>
+//       <StatusBar
+//         barStyle={theme !== "dark" ? "light-content" : "dark-content"}
+//       />
+//     </View>
+//   );
+// };
+
+// const styles = StyleSheet.create({
+//   container: {
+//     flex: 1,
+//     backgroundColor: "darkblue",
+//   },
+//   userName: {
+//     color: "white",
+//     fontSize: 22,
+//     fontWeight: "bold",
+//     padding: 20,
+//     paddingTop: 80,
+//   },
+//   taskStyle: {
+//     padding: 12,
+//   },
+//   task: {
+//     padding: 12,
+//     backgroundColor: "#fff",
+//     marginBottom: 8,
+//     borderRadius: 8,
+//     elevation: 1,
+//   },
+//   taskText: {
+//     color: "green",
+//     fontSize: 24,
+//     fontWeight: "bold",
+//     padding: 10,
+//     marginLeft: 10,
+//   },
+//   statusContainer: {
+//     flexDirection: "row",
+//     justifyContent: "space-between",
+//     alignItems: "center",
+//     paddingBottom: 5,
+//   },
+//   taskTitle: {
+//     fontSize: 18,
+//     fontWeight: "bold",
+//     paddingBottom: 5,
+//   },
+//   taskStatus: {
+//     fontSize: 14,
+//     color: "#666",
+//   },
+//   taskDescription: {
+//     fontSize: 14,
+//     color: "#666",
+//   },
+//   addButtonContainer: {
+//     marginBottom: 10,
+//     marginLeft: 280,
+//     marginRight: 10,
+//     borderRadius: 6,
+//     borderWidth: 2,
+//     borderColor: "white",
+//   },
+//   addButtonText: {
+//     color: "red",
+//     fontSize: 20,
+//     fontWeight: "bold",
+//     padding: 5,
+//     textAlign: "center",
+//   },
+//   pressed: {
+//     opacity: 0.7,
+//   },
+// });
+
+// export default HomeScreen;
+
+// export type Task = {
+//     status: string;
+//     id: string;
+//     title: string;
+//     description: string;
+// };
+  
+// export type FirestoreUser = {
+//     completedTasks: number;
+//     uid: string;
+//     name: string;
+// };
+
+
+import React, { useEffect, useState } from "react";
 import {
   StyleSheet,
   Text,
   View,
   FlatList,
   TouchableOpacity,
-  Button,
-  TextInput,
   Alert,
   StatusBar,
   Pressable,
+  Switch,
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../HomeStack";
 import { useColors } from "../../../../../contexts/ColorContext";
+import {
+  collection,
+  query,
+  where,
+  getDocs,
+  onSnapshot,
+  doc,
+  updateDoc,
+} from "firebase/firestore";
+import {
+  FIREBASE_AUTH,
+  FIREBASE_DB,
+} from "../../../../../firebase/FireBaseAuth";
 
-type Task = {
-  id: string;
-  title: string;
-  description: string;
-};
 
 type NavigationProp = NativeStackNavigationProp<
   RootStackParamList,
@@ -28,45 +262,93 @@ type NavigationProp = NativeStackNavigationProp<
 >;
 
 const HomeScreen: React.FC = () => {
-  const [tasks, setTasks] = useState<Task[]>([
-    { id: "1", title: "Task 1", description: "Description 1" },
-    { id: "2", title: "Task 2", description: "Description 2" },
-    { id: "3", title: "Task 3", description: "Description 3" },
-  ]);
-
+  const [tasks, setTasks] = useState<Task[]>([]);
+  const [completedTasks, setCompletedTasks] = useState<number>(0);
   const navigation = useNavigation<NavigationProp>();
+  const user = FIREBASE_AUTH.currentUser;
 
-  const handleEditTask = (id: string) => {
-    Alert.alert("Edit Task", `Editing task with ID: ${id}`);
-    // You can add functionality to edit the task here
+  useEffect(() => {
+    if (user) {
+   
+      const fetchUserData = async () => {
+        try {
+          const userDoc = await getDocs(query(collection(FIREBASE_DB, "users"), where("uid", "==", user.uid)));
+          const userData = userDoc.docs[0]?.data() as FirestoreUser;
+          setCompletedTasks(userData?.completedTasks || 0);
+        } catch (error) {
+          console.error("Error fetching user data: ", error);
+        }
+      };
+
+      fetchUserData();
+
+  
+      const q = query(
+        collection(FIREBASE_DB, "tasks"),
+        where("userId", "==", user.uid)
+      );
+      const unsubscribe = onSnapshot(q, (querySnapshot) => {
+        const tasksList: Task[] = querySnapshot.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+        })) as Task[];
+        setTasks(tasksList);
+      });
+
+      return () => unsubscribe();
+    }
+  }, [user]);
+
+  const handleToggleTaskStatus = async (taskId: string, currentStatus: string) => {
+    try {
+      const taskDocRef = doc(FIREBASE_DB, "tasks", taskId);
+      const newStatus = currentStatus === "Completed" ? "Not Completed" : "Completed";
+
+      await updateDoc(taskDocRef, { status: newStatus });
+      if (newStatus === "Completed") {
+        setCompletedTasks((prevCount) => prevCount + 1);
+        await updateDoc(doc(FIREBASE_DB, "users", user!.uid), {
+          completedTasks: completedTasks + 1,
+        });
+      } else {
+        setCompletedTasks((prevCount) => prevCount - 1);
+        await updateDoc(doc(FIREBASE_DB, "users", user!.uid), {
+          completedTasks: completedTasks - 1,
+        });
+      }
+    } catch (error) {
+      console.error("Error updating task status: ", error);
+    }
+  };
+
+  const handleEditTask = (task: Task) => {
+    navigation.navigate("EditTask", { task });
   };
 
   const renderTask = ({ item }: { item: Task }) => (
-    <TouchableOpacity
-      style={styles.task}
-      onPress={() => handleEditTask(item.id)}
-    >
+    <TouchableOpacity style={styles.task} onPress={() => handleEditTask(item)}>
       <Text style={styles.taskTitle}>{item.title}</Text>
+      <View style={styles.statusContainer}>
+        <Text style={styles.taskStatus}>
+          Status: {item.status}
+        </Text>
+        <Switch
+          value={item.status === "Completed"}
+          onValueChange={() => handleToggleTaskStatus(item.id, item.status)}
+        />
+      </View>
       <Text style={styles.taskDescription}>{item.description}</Text>
     </TouchableOpacity>
   );
+
   const { theme } = useColors();
+
   return (
     <View style={styles.container}>
-      {/* <View>
-        will show pie char here 
-      </View> */}
-      <Text
-        style={{
-          color: "white",
-          fontSize: 20,
-          fontWeight: "bold",
-          padding: 30,
-          paddingTop: 70,
-        }}
-      >
-        Your Tasks
+      <Text style={styles.userName}>
+        Welcome, you have completed {completedTasks} tasks.
       </Text>
+      <Text style={styles.taskText}>All Tasks</Text>
       <FlatList
         data={tasks}
         renderItem={renderTask}
@@ -74,14 +356,14 @@ const HomeScreen: React.FC = () => {
         contentContainerStyle={styles.taskStyle}
       />
       <Pressable
-          onPress={() => navigation.navigate("AddTask")}
-          style={({ pressed }: { pressed: boolean }) => [
-            styles.addButtonContainer,
-            pressed && styles.pressed,
-          ]}
-        >
-          <Text style={styles.addButtonText}>Add Task</Text>
-        </Pressable>
+        onPress={() => navigation.navigate("AddTask")}
+        style={({ pressed }) => [
+          styles.addButtonContainer,
+          pressed && styles.pressed,
+        ]}
+      >
+        <Text style={styles.addButtonText}>Add Task</Text>
+      </Pressable>
       <StatusBar
         barStyle={theme !== "dark" ? "light-content" : "dark-content"}
       />
@@ -94,29 +376,51 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "darkblue",
   },
+  userName: {
+    color: "white",
+    fontSize: 22,
+    fontWeight: "bold",
+    padding: 20,
+    paddingTop: 80,
+  },
   taskStyle: {
-    padding: 16,
+    padding: 12,
   },
   task: {
-    padding: 16,
+    padding: 12,
     backgroundColor: "#fff",
     marginBottom: 8,
     borderRadius: 8,
     elevation: 1,
   },
-  pressed: {
-    opacity: 0.7,
+  taskText: {
+    color: "green",
+    fontSize: 24,
+    fontWeight: "bold",
+    padding: 10,
+    marginLeft: 10,
+  },
+  statusContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    paddingBottom: 5,
   },
   taskTitle: {
     fontSize: 18,
     fontWeight: "bold",
+    paddingBottom: 5,
+  },
+  taskStatus: {
+    fontSize: 14,
+    color: "#666",
   },
   taskDescription: {
     fontSize: 14,
     color: "#666",
   },
   addButtonContainer: {
-   marginBottom: 15,
+    marginBottom: 10,
     marginLeft: 280,
     marginRight: 10,
     borderRadius: 6,
@@ -128,8 +432,24 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: "bold",
     padding: 5,
-    textAlign: 'center'
-  }
+    textAlign: "center",
+  },
+  pressed: {
+    opacity: 0.7,
+  },
 });
 
 export default HomeScreen;
+
+export type Task = {
+  status: string;
+  id: string;
+  title: string;
+  description: string;
+};
+
+export type FirestoreUser = {
+  completedTasks: number;
+  uid: string;
+  name: string;
+};

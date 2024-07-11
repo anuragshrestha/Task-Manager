@@ -1,29 +1,67 @@
-import React, { useState } from 'react';
-import { StyleSheet, Text, View, TextInput, Button, TouchableOpacity, StatusBar, Pressable } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
-import Icon from 'react-native-vector-icons/FontAwesome'; // Make sure you have react-native-vector-icons installed
-import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { RootStackParamList } from '../HomeStack';
-import { useColors } from '../../../../../contexts/ColorContext';
 
 
-type NavigationProp = NativeStackNavigationProp<RootStackParamList, 'HomeScreen'>;
+
+import React, { useState } from "react";
+import {
+  StyleSheet,
+  Text,
+  View,
+  TextInput,
+  TouchableOpacity,
+  StatusBar,
+  Pressable,
+} from "react-native";
+import { useNavigation } from "@react-navigation/native";
+import Icon from "react-native-vector-icons/FontAwesome";
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import { RootStackParamList } from "../HomeStack";
+import { useColors } from "../../../../../contexts/ColorContext";
+import {
+  FIREBASE_AUTH,
+  FIREBASE_DB,
+} from "../../../../../firebase/FireBaseAuth";
+import { addDoc, Timestamp, collection } from "firebase/firestore";
+
+type NavigationProp = NativeStackNavigationProp<
+  RootStackParamList,
+  "HomeScreen"
+>;
 
 const AddTaskScreen: React.FC = () => {
-  const [title, setTitle] = useState('');
-  const [description, setDescription] = useState('');
+  const [title, setTitle] = useState("");
+  const [description, setDescription] = useState("");
 
   const navigation = useNavigation<NavigationProp>();
+  const user = FIREBASE_AUTH.currentUser;
+  const { theme } = useColors();
 
-  const  saveTask= () => {
-    console.log('Task added:', { title, description });
+  const saveTask = async () => {
+    if (user) {
+      try {
+        await addDoc(collection(FIREBASE_DB, "tasks"), {
+          userId: user.uid,
+          title,
+          description,
+          createdAt: Timestamp.fromDate(new Date()),
+        });
+        console.log("Task added:", { title, description });
+        navigation.navigate("HomeScreen");
+      } catch (error) {
+        console.log("Error while adding task: ", error);
+      }
+    }
   };
 
-  const { theme } = useColors();
-  
+  const deleteTask = () => {
+    navigation.navigate("HomeScreen");
+  };
+
   return (
     <View style={styles.container}>
-      <TouchableOpacity onPress={() => navigation.navigate("HomeScreen")} style={styles.backButton}>
+      <TouchableOpacity
+        onPress={() => navigation.navigate("HomeScreen")}
+        style={styles.backButton}
+      >
         <Icon name="arrow-left" size={20} color="black" />
       </TouchableOpacity>
       <Text style={styles.label}>Title</Text>
@@ -41,15 +79,26 @@ const AddTaskScreen: React.FC = () => {
         placeholder="Enter task description"
         multiline
       />
+      <View style={styles.buttonRow}>
+        <Pressable
+          onPress={() => deleteTask()}
+          style={({ pressed }) => [
+            styles.button, styles.buttonbackground1,
+            pressed && styles.pressed, 
+          ]}
+        >
+          <Text style={styles.buttonText}>Delete Task</Text>
+        </Pressable>
         <Pressable
           onPress={() => saveTask()}
-          style={({ pressed }: { pressed: boolean }) => [
-            styles.addButtonContainer,
+          style={({ pressed }) => [
+            styles.button, styles.buttonbackground2,
             pressed && styles.pressed,
           ]}
         >
-          <Text style={styles.addButtonText}>Save Task</Text>
+          <Text style={styles.buttonText}>Save Task</Text>
         </Pressable>
+      </View>
       <StatusBar
         barStyle={theme === "dark" ? "light-content" : "dark-content"}
       />
@@ -61,56 +110,64 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 16,
-    backgroundColor: 'lightwhite',
+    backgroundColor: "lightwhite",
     paddingTop: 20,
   },
   backButton: {
     marginBottom: 16,
     paddingTop: 30,
   },
-  pressed:{
-    opacity: 0.2
+  pressed: {
+    opacity: 0.2,
   },
   label: {
     fontSize: 24,
     marginBottom: 8,
-    fontWeight: 'bold',
+    fontWeight: "bold",
     padding: 5,
   },
   input: {
     fontSize: 16,
     padding: 8,
     marginBottom: 16,
-    backgroundColor: '#fff',
+    backgroundColor: "#fff",
     borderRadius: 8,
     elevation: 1,
   },
-  descriptionInput:{
+  descriptionInput: {
     fontSize: 16,
     marginBottom: 10,
-    backgroundColor: '#fff',
+    backgroundColor: "#fff",
     borderRadius: 8,
     elevation: 1,
     padding: 8,
-    textAlignVertical: 'top',
-    height: 160, 
+    textAlignVertical: "top",
+    height: 160,
   },
-  addButtonContainer: {
+  buttonRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginTop: 20,
+  },
+  button: {
     borderRadius: 6,
     borderWidth: 2,
     borderColor: "black",
     padding: 10,
-    width: '40%', 
-    marginLeft: 120,
-    margin: 10
-     
-   },
-   addButtonText: {
-     color: "black",
-     fontSize: 20,
-     fontWeight: "bold",
-     textAlign: 'center'
-   }
+    width: "45%",
+  },
+  buttonText: {
+    color: "white",
+    fontSize: 20,
+    fontWeight: "bold",
+    textAlign: "center",
+  },
+  buttonbackground1:{
+     backgroundColor: 'red'
+  },
+  buttonbackground2:{
+    backgroundColor: 'green'
+ }
 });
 
 export default AddTaskScreen;

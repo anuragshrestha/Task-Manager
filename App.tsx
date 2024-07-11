@@ -55,10 +55,10 @@ import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { StatusBar, View, StyleSheet, ActivityIndicator } from "react-native";
 import { onAuthStateChanged, User } from "firebase/auth";
-import { FIREBASE_AUTH } from  "./src/firebase/FireBaseAuth"
 import { ColorContextProvider, useColors } from "./src/contexts/ColorContext";
 import AuthenticatedStack from "./src/nav/AuthenticatedStack/AuthenticatedStack";
 import AuthStack from "./src/nav/AuthStack/AuthStack";
+import { FIREBASE_AUTH } from "./src/firebase/FireBaseAuth";
 
 type AuthStackParamList = { 
   AuthStack: undefined;

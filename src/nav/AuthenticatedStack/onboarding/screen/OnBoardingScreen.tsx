@@ -2,15 +2,9 @@ import React from "react";
 import { StyleSheet, Text, View, Button } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import { AuthStackParamList } from "../../AuthenticatedStack";
-
-type NavigationProp = NativeStackNavigationProp<
-  AuthStackParamList,
-  "OnBoarding"
->;
 
 function OnBoardingScreen() {
-  const navigation = useNavigation<NavigationProp>();
+  const navigation = useNavigation<any>();
 
   return (
     <View style={styles.container}>

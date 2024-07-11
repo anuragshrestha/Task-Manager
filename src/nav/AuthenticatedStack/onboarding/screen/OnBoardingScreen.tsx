@@ -2,6 +2,7 @@ import React from "react";
 import { StyleSheet, Text, View, Button } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import { completeUserOnBoarding } from "../../../../storage";
 
 function OnBoardingScreen() {
   const navigation = useNavigation<any>();
@@ -13,7 +14,10 @@ function OnBoardingScreen() {
         <Button
           title="Get Started"
           color="white"
-          onPress={() => navigation.navigate("MainAppStack")}
+          onPress={() => {
+            completeUserOnBoarding("test")
+            navigation.replace("MainAppStack")
+          }}
         />
       </View>
     </View>

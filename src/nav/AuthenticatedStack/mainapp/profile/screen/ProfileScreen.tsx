@@ -5,36 +5,51 @@ import {
   ScrollView,
   Pressable,
 } from "react-native";
-import React from "react";
+import React, { useEffect, useRef } from "react";
 import ScreenWrapper from "../../../../../components/ScreenWrappper";
 import { useColors } from "../../../../../contexts/ColorContext";
 import Icon from "react-native-vector-icons/FontAwesome";
 import { signOut } from "firebase/auth";
 import { useNavigation, NavigationProp } from "@react-navigation/native";
-import { FIREBASE_AUTH } from "../../../../../firebase/FireBaseAuth";
+import { FIREBASE_AUTH, FIREBASE_DB } from "../../../../../firebase/FireBaseAuth";
 import { RootStackParamList } from "../../home/HomeStack";
+import { onSnapshot, doc } from "firebase/firestore";
 
 const AccountScreen = () => {
   const { colors } = useColors();
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
+  const unsubscribeRef = useRef<(() => void) | null>(null);
 
-  function editProfileButton() {
-    console.log("edit profile button is pressed");
-  }
+  useEffect(() => {
+    const user = FIREBASE_AUTH.currentUser;
+    if (user) {
+      const userDocRef = doc(FIREBASE_DB, "users", user.uid);
+      unsubscribeRef.current = onSnapshot(userDocRef, (doc) => {
+        // if (doc.exists()) {
+        //   // Handle user data
+        // }
+      });
+    }
+
+    return () => {
+      if (unsubscribeRef.current) {
+        unsubscribeRef.current();
+      }
+    };
+  }, []);
 
   const logOut = async () => {
     try {
+      if (unsubscribeRef.current) {
+        unsubscribeRef.current();
+      }
       await signOut(FIREBASE_AUTH);
       console.log("User logged out");
-      navigation.navigate("SignIn"); 
+      navigation.navigate("SignIn");
     } catch (error) {
       console.error("Error logging out: ", error);
     }
   };
-
-  function navigateScreen(screen: string) {
-    console.log(`navigating to ${screen} screen`);
-  }
 
   return (
     <ScreenWrapper>
@@ -42,35 +57,25 @@ const AccountScreen = () => {
         <Text style={[styles.profileText, { color: colors.primary_black }]}>
           Your Profile
         </Text>
-        <View
-          style={{
-            justifyContent: "center",
-            alignItems: "center",
-            paddingVertical: 25,
-          }}
-        >
-          <View
-            style={styles.icon}
-          >
+        <View style={{ justifyContent: "center", alignItems: "center", paddingVertical: 25 }}>
+          <View style={styles.icon}>
             <Icon name="user" size={100} color={colors.primary_black} />
           </View>
           <View style={styles.borderContainer}>
-            <View />
             <Pressable
               style={({ pressed }: { pressed: boolean }) => [
                 styles.buttonContainer,
                 pressed && styles.pressed,
               ]}
-              onPress={editProfileButton}
+              onPress={() => console.log("edit profile button is pressed")}
             >
               <Text style={styles.buttonText}>Edit Profile</Text>
             </Pressable>
           </View>
         </View>
-
         <View>
           <Pressable
-            onPress={() => navigateScreen("Payment")}
+            onPress={() => console.log(`navigating to Payment screen`)}
             style={({ pressed }: { pressed: boolean }) => [
               styles.menuItem,
               pressed && styles.pressed,
@@ -81,7 +86,7 @@ const AccountScreen = () => {
             </Text>
           </Pressable>
           <Pressable
-            onPress={() => navigateScreen("Subscriptions")}
+            onPress={() => console.log(`navigating to Subscriptions screen`)}
             style={({ pressed }: { pressed: boolean }) => [
               styles.menuItem,
               pressed && styles.pressed,
@@ -92,7 +97,7 @@ const AccountScreen = () => {
             </Text>
           </Pressable>
           <Pressable
-            onPress={() => navigateScreen("Settings")}
+            onPress={() => console.log(`navigating to Settings screen`)}
             style={({ pressed }: { pressed: boolean }) => [
               styles.menuItem,
               pressed && styles.pressed,
@@ -103,7 +108,7 @@ const AccountScreen = () => {
             </Text>
           </Pressable>
           <Pressable
-            onPress={() => navigateScreen("Contact")}
+            onPress={() => console.log(`navigating to Contact screen`)}
             style={({ pressed }: { pressed: boolean }) => [
               styles.menuItem,
               pressed && styles.pressed,
@@ -114,7 +119,7 @@ const AccountScreen = () => {
             </Text>
           </Pressable>
           <Pressable
-            onPress={() => navigateScreen("FeedBack")}
+            onPress={() => console.log(`navigating to FeedBack screen`)}
             style={({ pressed }: { pressed: boolean }) => [
               styles.menuItem,
               pressed && styles.pressed,
@@ -126,7 +131,7 @@ const AccountScreen = () => {
           </Pressable>
         </View>
         <Pressable
-        onPress={logOut}
+          onPress={logOut}
           style={({ pressed }: { pressed: boolean }) => [
             styles.logOutItem,
             pressed && styles.pressed,
@@ -146,7 +151,7 @@ const styles = StyleSheet.create({
     textAlign: "center",
     paddingTop: 5,
   },
-  icon:{
+  icon: {
     justifyContent: "center",
     alignItems: "center",
     marginVertical: 10,

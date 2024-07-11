@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import OnBoardingScreen from './onboarding/screen/OnBoardingScreen';
 import MainAppStack from './mainapp/MainAppStack';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useUser } from '../../contexts/UserProvider';
 import TransitionScreen from '../TransitionScreen';
 

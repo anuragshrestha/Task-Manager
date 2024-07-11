@@ -1,6 +1,3 @@
-
-
-
 import React, { useState } from "react";
 import {
   StyleSheet,
@@ -87,7 +84,7 @@ const AddTaskScreen: React.FC = () => {
             pressed && styles.pressed, 
           ]}
         >
-          <Text style={styles.buttonText}>Delete Task</Text>
+          <Text style={styles.buttonText}>Cancel Task</Text>
         </Pressable>
         <Pressable
           onPress={() => saveTask()}
@@ -166,7 +163,7 @@ const styles = StyleSheet.create({
      backgroundColor: 'red'
   },
   buttonbackground2:{
-    backgroundColor: 'green'
+    backgroundColor: 'blue'
  }
 });
 

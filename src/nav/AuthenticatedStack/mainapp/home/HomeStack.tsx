@@ -1,9 +1,9 @@
 
 import React from 'react';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import HomeScreen, { Task } from './screens/HomeScreen';
+import HomeScreen from './screens/HomeScreen';
 import AddScreen from './screens/AddTaskScreen';
-// import EditTaskScreen from './screens/EditTaskScreen';
+import EditTaskScreen from './screens/EditTaskScreen';
 
 export type RootStackParamList = {
   HomeScreen: undefined;
@@ -20,14 +20,21 @@ function HomeStack() {
     <Stack.Navigator>
       <Stack.Screen name="HomeScreen" component={HomeScreen}  options={{headerShown: false}}/>
       <Stack.Screen name="AddTask" component={AddScreen}  options={{headerShown: false}}/>
-      {/* <Stack.Screen
+      <Stack.Screen
         name="EditTask"
         component={EditTaskScreen}
         options={{ headerShown: false }}
-      /> */}
+      />
     </Stack.Navigator>
    
   );
+};
+
+export type Task = {
+  id: string;
+  title: string;
+  description: string;
+  status: string;
 };
 
 export default HomeStack;

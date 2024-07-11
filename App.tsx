@@ -50,72 +50,22 @@
 // export default App;
 
 
-import React, { useEffect, useState } from "react";
-import { NavigationContainer } from "@react-navigation/native";
-import { createNativeStackNavigator } from "@react-navigation/native-stack";
-import { StatusBar, View, StyleSheet, ActivityIndicator } from "react-native";
-import { onAuthStateChanged, User } from "firebase/auth";
-import { ColorContextProvider, useColors } from "./src/contexts/ColorContext";
-import AuthenticatedStack from "./src/nav/AuthenticatedStack/AuthenticatedStack";
-import AuthStack from "./src/nav/AuthStack/AuthStack";
-import { FIREBASE_AUTH } from "./src/firebase/FireBaseAuth";
-
-type AuthStackParamList = { 
-  AuthStack: undefined;
-  AuthenticatedStack: undefined;
-};
-
-const Stack = createNativeStackNavigator<AuthStackParamList>();
+import React from "react";
+import { ColorContextProvider } from "./src/contexts/ColorContext";
+import RootNavigator from "./src/nav/RootNavigator";
+import { UserProvider } from "./src/contexts/UserProvider";
 
 function App() {
-  const { theme } = useColors();
-  const [loading, setLoading] = useState(true);
-  const [user, setUser] = useState<User | null>(null);
-
-  useEffect(() => {
-    const unsubscribe = onAuthStateChanged(FIREBASE_AUTH, (user) => {
-      setUser(user);
-      setLoading(false);
-    });
-    return unsubscribe;
-  }, []);
-
-  if (loading) {
-    return (
-      <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" />
-      </View>
-    );
-  }
-
   return (
     <ColorContextProvider>
-      <View style={styles.container}>
-        <NavigationContainer>
-          <Stack.Navigator screenOptions={{ headerShown: false }}>
-            {user ? (
-              <Stack.Screen name="AuthenticatedStack" component={AuthenticatedStack} />
-            ) : (
-              <Stack.Screen name="AuthStack" component={AuthStack} />
-            )}
-          </Stack.Navigator>
-        </NavigationContainer>
-        <StatusBar barStyle={theme === "dark" ? "light-content" : "dark-content"} />
-      </View>
+    <UserProvider>
+      <RootNavigator />
+      </UserProvider>
     </ColorContextProvider>
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  loadingContainer: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-});
+
 
 export default App;
 

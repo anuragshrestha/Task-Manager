@@ -3,9 +3,11 @@ import { StyleSheet, Text, View, Button } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { completeUserOnBoarding } from "../../../../storage";
+import { useUser } from "../../../../contexts/UserProvider";
 
 function OnBoardingScreen() {
   const navigation = useNavigation<any>();
+  const {user, setOnBoarded} = useUser()
 
   return (
     <View style={styles.container}>
@@ -15,8 +17,8 @@ function OnBoardingScreen() {
           title="Get Started"
           color="white"
           onPress={() => {
-            completeUserOnBoarding("test")
-            navigation.replace("MainAppStack")
+            completeUserOnBoarding(user?.email)
+            setOnBoarded(true)
           }}
         />
       </View>
